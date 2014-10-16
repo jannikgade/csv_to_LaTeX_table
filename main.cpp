@@ -1,6 +1,6 @@
 /*
  *  This program converts a .csv file into a table using the LaTeX syntax.
- *  Use the arguments: -h, -p, -t, -r, -e and -s to specify what should be done to the file
+ *  Use the arguments: -h, -p, -t, -r, -e, -s and -a to specify what should be done to the file
  *
  *  (Based opon The MIT License (MIT))
  *
@@ -28,7 +28,7 @@
 #include <iostream>
 #include "convert.h"
 
-#define NUMER_OF_KNOWN_ARGUMENTS 6
+#define NUMER_OF_KNOWN_ARGUMENTS 7
 
 using namespace std;
 
@@ -51,7 +51,7 @@ int main(int argc, const char * argv[])
         
         if (valid_filename) {
             
-            string list_of_known_arguments[NUMER_OF_KNOWN_ARGUMENTS] = {"-h","-p","-t","-r","-e","-s"};
+            string list_of_known_arguments[NUMER_OF_KNOWN_ARGUMENTS] = {"-h","-p","-t","-r","-e","-s","-a"};
             bool arguments[NUMER_OF_KNOWN_ARGUMENTS] = {false};
             
             for (int i=0; i<NUMER_OF_KNOWN_ARGUMENTS; i++) {
@@ -61,7 +61,7 @@ int main(int argc, const char * argv[])
                     }
                 }
             }
-            test.convert_csv_to_latex_table(filename,arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5]);
+            test.convert_csv_to_latex_table(filename,arguments[0],arguments[1],arguments[2],arguments[3],arguments[4],arguments[5],arguments[6]);
             
         }
         else
@@ -70,11 +70,6 @@ int main(int argc, const char * argv[])
         }
          
     }
-    
-    
-    
-    
-    
     
     return 0;
 }

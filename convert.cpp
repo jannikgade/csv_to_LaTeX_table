@@ -1,6 +1,6 @@
 /*
  *  This program converts a .csv file into a table using the LaTeX syntax.
- *  Use the arguments: -h, -p, -t, -r, -e and -s to specify what should be done to the file
+ *  Use the arguments: -h, -p, -t, -r, -e, -s and -a to specify what should be done to the file
  *
  *  (Based opon The MIT License (MIT))
  *
@@ -27,11 +27,11 @@
 
 #include "convert.h"
 
-#define NUMER_OF_KNOWN_ARGUMENTS 6
+#define NUMER_OF_KNOWN_ARGUMENTS 7
 
 using namespace std;
 
-void latex_table::convert_csv_to_latex_table(string in_filename, bool help, bool print, bool trans, bool rev, bool exp, bool save){
+void latex_table::convert_csv_to_latex_table(string in_filename, bool help, bool print, bool trans, bool rev, bool exp, bool save, bool alter){
     
     if (help)
     {
@@ -58,8 +58,13 @@ void latex_table::convert_csv_to_latex_table(string in_filename, bool help, bool
         if (!exp) {
             convert_exp_to_math(array);
         }
+        if (alter) {
+            convert_array_to_string_alternating_rows(csv_string, array);
+        } else {
+            convert_array_to_string(csv_string, array);
+        }
         
-        convert_array_to_string(csv_string, array);
+        
         
         add_latex_table_header(filename);
         
@@ -259,6 +264,8 @@ int latex_table::convert_exp_to_math(string **ptr){
 
 void latex_table::convert_array_to_string(string &target_str, string **ptr) {
     
+    
+    
     target_str.clear();
     
     for (int row = 0; row<height; row++) {
@@ -274,6 +281,26 @@ void latex_table::convert_array_to_string(string &target_str, string **ptr) {
     }
 }
 
+void latex_table::convert_array_to_string_alternating_rows(string &target_str, string **ptr) {
+    
+    
+    target_str.clear();
+    
+    for (int row = 0; row<height; row++) {
+        if ((row%2)) {
+            target_str += "\\rowcolor[gray]{0.8}";
+        }
+        for (int col=0; col<width; col++) {
+            
+            if (col<width-1) {
+                target_str +=  array[row][col] + "&\t";
+            } else {
+                target_str +=  array[row][col];
+            }
+        }
+        target_str += "\\\\\t\\hline\n";
+    }
+}
 
 void latex_table::reverse(){
     
@@ -357,9 +384,10 @@ void latex_table::print_help(){
     commands[0] = "\n-h\tHelp\t\tDisplays the functionality of the program (This is what you're currently reading).";
     commands[1] = "\n-p\tPrint\t\tPrints the LaTeX table to the terminal. This is useful if you can copy text directly from the terminal.";
     commands[2] = "\n-t\tTranspose\tRotates the table 90degrees. eg. rows become columns and vice versa";
-    commands[3] = "\n-r\tReverse\t\tReverses the csv table. eg. first element becomes the lase and so on.";
+    commands[3] = "\n-r\tReverse\t\tReverses the csv table. eg. first element becomes the last and so on.";
     commands[4] = "\n-e\tExponent\tReplaces exponential notation with LaTeX syntax. eg. 6.022e23 becomes 6.022$\\cdot 10^{23}$. On by default";
     commands[5] = "\n-s\tSave\t\tSaves the latex table as <original filname>_LaTeX.txt. On by default";
+    commands[5] = "\n-a\tAlternating\tAlternating row colors.";
     
     cout << top + copyright_and_usage;
     

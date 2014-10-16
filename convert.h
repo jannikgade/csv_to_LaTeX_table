@@ -1,6 +1,6 @@
 /*
  *  This program converts a .csv file into a table using the LaTeX syntax.
- *  Use the arguments: -h, -p, -t, -r, -e and -s to specify what should be done to the file
+ *  Use the arguments: -h, -p, -t, -r, -e, -s and -a to specify what should be done to the file
  *
  *  (Based opon The MIT License (MIT))
  *
@@ -53,8 +53,9 @@ private:
     void cleanup();
     void transpose();
     void reverse();
+    void convert_array_to_string_alternating_rows(string &target_str, string **ptr);
 public:
-    void convert_csv_to_latex_table(string in_filename, bool help=false, bool print=false, bool trans=false, bool rev=false, bool exp=false, bool save=false);
+    void convert_csv_to_latex_table(string in_filename, bool help=false, bool print=false, bool trans=false, bool rev=false, bool exp=false, bool save=false, bool alter=false);
     void print_LaTeX_string();
     void print_help();
 };
