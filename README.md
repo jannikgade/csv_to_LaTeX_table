@@ -21,11 +21,12 @@ This simple program converts a .csv file into a table using the LaTeX syntax. Us
 * **-a** *Alternating row colors.*
 
 ##Examples of Usage
-###Linux and OSX
+The following examples will call the converter with the test file: test.csv. Set the flags as needed.
 
+###Linux and OSX
     cd /Users/<username>/Downloads/
     ./csv_to_LaTeX_table_v.0.1 test.csv -p -e
 
 ###Windows
-    cd /Users/<username>/Downloads/
+    cd \Users\<username>\Downloads\
     csv_to_LaTeX_table_v.0.1.exe test.csv -p -e
