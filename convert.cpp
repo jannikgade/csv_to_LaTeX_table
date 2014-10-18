@@ -60,7 +60,8 @@ void latex_table::convert_csv_to_latex_table(string in_filename, bool help, bool
         }
         if (alter) {
             convert_array_to_string_alternating_rows(csv_string, array);
-        } else {
+        }
+        else {
             convert_array_to_string(csv_string, array);
         }
         
@@ -70,7 +71,7 @@ void latex_table::convert_csv_to_latex_table(string in_filename, bool help, bool
         
         cleanup();
         
-        if (print||save) {
+        if (print || save) {
             print_LaTeX_string();
         }
         
@@ -87,13 +88,13 @@ void latex_table::add_latex_table_header(string latex_label){
     
     //remove spaces from name (spaces not allowen in LaTeX labels)
     char c;
-    int i=0;
+    int i = 0;
     while (latex_label[i])
     {
-        c=latex_label[i];
-        if (!isalpha(c)&&!isdigit(c)) {
-            latex_label[i]='_';
-        } c='_';
+        c = latex_label[i];
+        if (!isalpha(c) && !isdigit(c)) {
+            latex_label[i] = '_';
+        } c = '_';
         i++;
     }
     
@@ -101,17 +102,17 @@ void latex_table::add_latex_table_header(string latex_label){
     
     string head_end_table = "\n\\end{tabular}\n\\caption{}\n\\label{tab:" + latex_label + "}\n\\end{table}";
     
-    for (int i=0; i<width; i++) {
-        head_begin_table+="l|";
+    for (int i = 0; i<width; i++) {
+        head_begin_table += "l|";
     }
-    head_begin_table+="}\n\\hline\n";
+    head_begin_table += "}\n\\hline\n";
     
     csv_string = head_begin_table + csv_string + head_end_table;
 }
 
 void latex_table::save_latex_table_to_file(){
     
-    ofstream output_file (filename+"_LaTeX.txt");
+    ofstream output_file(filename + "_LaTeX.txt");
     
     if (output_file.is_open())
     {
@@ -122,24 +123,32 @@ void latex_table::save_latex_table_to_file(){
 }
 
 int latex_table::convert_exponential_to_math(string &target_str, string start_str, string stop_str, string replacement_str_1, string replacement_str_2){
+    char c, d;
     
-    //cout << target_str << endl;
     int replacements_made = 0;
-    size_t keyword_start = target_str.find(start_str,0);
-    size_t keyword_stop = target_str.find(stop_str,keyword_start);
+    size_t keyword_start = target_str.find(start_str, 0);
+    size_t keyword_stop = target_str.find(stop_str, keyword_start);
     
-    if (keyword_stop>target_str.length()) {
-        keyword_stop=target_str.length();
+    if (keyword_stop > target_str.length()) {
+        keyword_stop = target_str.length();
     }
     
-    char c=target_str[keyword_start-1];
+    if (keyword_start + 1 < target_str.length() && (keyword_start - 1 < target_str.length())) {
+        // previous character should not be alphabetic
+        
+        c = target_str[keyword_start - 1];
+        d = target_str[keyword_start + 1];
+        
+    }
+    //cout << "String: " << target_str << endl;
+    //cout << target_str << endl;
     
-    while (keyword_start!=string::npos) {
-        if (isdigit(c)) {
-            keyword_stop = target_str.find(stop_str,keyword_start);
+    while (keyword_start != string::npos&&(keyword_start + 1 < target_str.length()) && (keyword_start - 1 < target_str.length())) {
+        if (!isalpha(c) && (isdigit(d) || d == '+' || d == '-')) {
+            keyword_stop = target_str.find(stop_str, keyword_start);
             
             if (keyword_stop>target_str.length()) {
-                keyword_stop=target_str.length();
+                keyword_stop = target_str.length();
             }
             
             target_str.insert(keyword_stop, replacement_str_2);
@@ -149,8 +158,30 @@ int latex_table::convert_exponential_to_math(string &target_str, string start_st
             
         }
         
-        keyword_start = target_str.find(start_str,keyword_start+replacement_str_1.length());
-        c=target_str[keyword_start-1];
+        keyword_start = target_str.find(start_str, keyword_start + replacement_str_1.length());
+        
+        if (keyword_start + 1 < target_str.length() && (keyword_start - 1 < target_str.length())) {
+            // previous character should not be alphabetic
+            if (!isalpha(target_str[keyword_start - 1])){
+                c = target_str[keyword_start - 1];
+            }
+            else {
+                c = '0';
+            }
+            // previous character should be + - or digit
+            if (isdigit(target_str[keyword_start + 1]) || target_str[keyword_start + 1] == '+' || target_str[keyword_start + 1] == '-'){
+                d = target_str[keyword_start + 1];
+            }
+            else {
+                d = 'a';
+            }
+            
+        }
+        else {
+            c = 'a';
+            d = '0';
+        }
+        
         
     }
     
@@ -163,26 +194,27 @@ void latex_table::print_LaTeX_string() {
 
 int latex_table::number_of_occurences(string &target_str, string start_str, string stop_str){
     int number_of_items_found = 0;
-    size_t keyword_start;
-    size_t keyword_stop;
+    size_t keyword_start = 0;
+    size_t keyword_stop = 0;
     
     //if no stop string is specified search entire file
-    if (stop_str=="") {
-        keyword_start = target_str.find(start_str,0);
+    if (stop_str == "") {
+        keyword_start = target_str.find(start_str, 0);
         //find last element of the type
         keyword_stop = target_str.rfind(start_str);
     }
-    else if (stop_str==""&&start_str=="") {
+    else if (stop_str == ""&&start_str == "") {
         number_of_items_found = (int)target_str.length();
         //skip while loop
         keyword_start = keyword_stop++;
-    } else {
-        keyword_start = target_str.find(start_str,0);
-        keyword_stop = target_str.find(stop_str,0);
+    }
+    else {
+        keyword_start = target_str.find(start_str, 0);
+        keyword_stop = target_str.find(stop_str, 0);
     }
     
-    while ((keyword_start<keyword_stop)&&(keyword_start!=string::npos)){
-        keyword_start = target_str.find(start_str,keyword_start);
+    while ((keyword_start<keyword_stop) && (keyword_start != string::npos)){
+        keyword_start = target_str.find(start_str, keyword_start);
         number_of_items_found++;
         keyword_start++;
     }
@@ -200,11 +232,17 @@ void latex_table::split_string_into_array(string &target_str, string delimiter_1
     width = number_of_occurences(csv_string, ",", "\n");
     height = number_of_occurences(csv_string, "\n", "") + 1;    //last row won't have a newline
     
+    //if no newline is found the file is probably using return instead
+    if (!width) {
+        width = number_of_occurences(csv_string, ",", "\r");
+        height = number_of_occurences(csv_string, "\r", "") + 1;    //last row won't have a newline
+    }
+    
     //cout << "w: " << width << " h: " << height << endl;
     
     //create dynamic array the size of the picture
     array = new string*[height];
-    for (int row=0; row<height; row++) {
+    for (int row = 0; row<height; row++) {
         array[row] = new string[width];
     }
     
@@ -216,30 +254,29 @@ void latex_table::split_string_into_array(string &target_str, string delimiter_1
     keyword_linebreak = target_str.find(delimiter_2, 0);
     
     for (int row = 0; row<height; row++) {
-        for (int col=0; col<width; col++) {
+        for (int col = 0; col<width; col++) {
             
             if (keyword_linebreak<keyword_stop) {
-                array[row][col] = target_str.substr(keyword_start+1,keyword_linebreak-keyword_start-delimiter_2.length());
+                array[row][col] = target_str.substr(keyword_start + 1, keyword_linebreak - keyword_start - delimiter_2.length());
                 
                 keyword_start = keyword_linebreak;
-                keyword_stop = target_str.find(delimiter_1, keyword_start+1);
+                keyword_stop = target_str.find(delimiter_1, keyword_start + 1);
                 keyword_linebreak = target_str.find(delimiter_2, keyword_stop);
                 
-            } else {
-                array[row][col] = target_str.substr(keyword_start+1,keyword_stop-keyword_start-delimiter_1.length());
-                keyword_start = target_str.find(delimiter_1, keyword_start+1);
-                keyword_stop = target_str.find(delimiter_1, keyword_start+1);
             }
-            
+            else {
+                array[row][col] = target_str.substr(keyword_start + 1, keyword_stop - keyword_start - delimiter_1.length());
+                keyword_start = target_str.find(delimiter_1, keyword_start + 1);
+                keyword_stop = target_str.find(delimiter_1, keyword_start + 1);
+            }
         }
     }
-    
 }
 
 void latex_table::print_array(string **ptr){
     // print array
     for (int row = 0; row<height; row++) {
-        for (int col=0; col<width; col++) {
+        for (int col = 0; col<width; col++) {
             cout << ptr[row][col] << "\t";
         }
         cout << endl;
@@ -252,7 +289,7 @@ int latex_table::convert_exp_to_math(string **ptr){
     
     //find all exponents
     for (int row = 0; row<height; row++) {
-        for (int col=0; col<width; col++) {
+        for (int col = 0; col<width; col++) {
             replacements += convert_exponential_to_math(ptr[row][col], "e", "\t", "$\\cdot 10^{", "}$");
         }
     }
@@ -269,12 +306,13 @@ void latex_table::convert_array_to_string(string &target_str, string **ptr) {
     target_str.clear();
     
     for (int row = 0; row<height; row++) {
-        for (int col=0; col<width; col++) {
+        for (int col = 0; col<width; col++) {
             
-            if (col<width-1) {
-                target_str +=  array[row][col] + "&\t";
-            } else {
-                target_str +=  array[row][col];
+            if (col<width - 1) {
+                target_str += array[row][col] + "&\t";
+            }
+            else {
+                target_str += array[row][col];
             }
         }
         target_str += "\\\\\t\\hline\n";
@@ -287,15 +325,16 @@ void latex_table::convert_array_to_string_alternating_rows(string &target_str, s
     target_str.clear();
     
     for (int row = 0; row<height; row++) {
-        if ((row%2)) {
+        if ((row % 2)) {
             target_str += "\\rowcolor[gray]{0.8}";
         }
-        for (int col=0; col<width; col++) {
+        for (int col = 0; col<width; col++) {
             
-            if (col<width-1) {
-                target_str +=  array[row][col] + "&\t";
-            } else {
-                target_str +=  array[row][col];
+            if (col<width - 1) {
+                target_str += array[row][col] + "&\t";
+            }
+            else {
+                target_str += array[row][col];
             }
         }
         target_str += "\\\\\t\\hline\n";
@@ -308,22 +347,22 @@ void latex_table::reverse(){
     
     //create dynamic array
     temp_array = new string*[height];
-    for (int row=0; row<height; row++) {
+    for (int row = 0; row<height; row++) {
         temp_array[row] = new string[width];
     }
     //copy array to temp_array in reverse order
-    for (int row = height-1; row>=0; row--) {
-        for (int col=width-1; col>=0; col--) {
-            temp_array[height-1-row][width-1-col] = array[row][col];
+    for (int row = height - 1; row >= 0; row--) {
+        for (int col = width - 1; col >= 0; col--) {
+            temp_array[height - 1 - row][width - 1 - col] = array[row][col];
         }
     }
     
     // deallocate memory to prevent memory leak
     for (int i = 0; i < width; ++i) {
-        delete [] array[i];
+        delete[] array[i];
         array[i] = nullptr;
     }
-    delete [] array;
+    delete[] array;
     array = nullptr;
     
     // array will point to new location
@@ -338,23 +377,23 @@ void latex_table::transpose(){
     int temp_width = width;
     //create dynamic array that has: new width = old height and new heigth = old width
     temp_array = new string*[width];
-    for (int row=0; row<width; row++) {
+    for (int row = 0; row<width; row++) {
         temp_array[row] = new string[height];
     }
     
     //copy array to temp_array in transposed order
     for (int col = 0; col<width; col++) {
-        for (int row=0; row<height; row++) {
+        for (int row = 0; row<height; row++) {
             temp_array[col][row] = array[row][col];
         }
     }
     
     // deallocate memory to prevent memory leak
     for (int i = 0; i < width; ++i) {
-        delete [] array[i];
+        delete[] array[i];
         array[i] = nullptr;
     }
-    delete [] array;
+    delete[] array;
     array = nullptr;
     
     // array will point to new location
@@ -369,10 +408,10 @@ void latex_table::cleanup(){
     
     // deallocate memory to prevent memory leak
     for (int i = 0; i < height; ++i) {
-        delete [] array[i];
+        delete[] array[i];
         array[i] = nullptr;
     }
-    delete [] array;
+    delete[] array;
     array = nullptr;
 }
 
@@ -387,15 +426,16 @@ void latex_table::print_help(){
     commands[3] = "\n-r\tReverse\t\tReverses the csv table. eg. first element becomes the last and so on.";
     commands[4] = "\n-e\tExponent\tReplaces exponential notation with LaTeX syntax. eg. 6.022e23 becomes 6.022$\\cdot 10^{23}$. On by default";
     commands[5] = "\n-s\tSave\t\tSaves the latex table as <original filname>_LaTeX.txt. On by default";
-    commands[5] = "\n-a\tAlternating\tAlternating row colors.";
+    commands[6] = "\n-a\tAlternating\tAlternating row colors.";
     
     cout << top + copyright_and_usage;
     
-    for (int i=0; i<NUMER_OF_KNOWN_ARGUMENTS; i++) {
+    for (int i = 0; i<NUMER_OF_KNOWN_ARGUMENTS; i++) {
         cout << commands[i];
     }
     
     cout << "\n\nThe order of the arguments is not important." << endl;
     
     cout << top << endl;
+    
 }
