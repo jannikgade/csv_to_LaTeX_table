@@ -23,8 +23,8 @@ This simple program converts a .csv file into a table using the LaTeX syntax. Us
 ##Usage: Linux and OSX
 
     cd /Users/<username>/Downloads/
-    ./csv_to_LaTeX_table_v.0.1 fib2.csv -p -e
+    ./csv_to_LaTeX_table_v.0.1 test.csv -p -e
 
 ##Usage Windows
     cd /Users/<username>/Downloads/
-    csv_to_LaTeX_table_v.0.1.exe fib2.csv -p -e
+    csv_to_LaTeX_table_v.0.1.exe test.csv -p -e
